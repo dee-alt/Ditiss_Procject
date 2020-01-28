@@ -1,0 +1,22 @@
+---
+- hosts: all
+  become: true
+  #user: lynis
+  gather_facts: True
+  tasks:
+   - name: Copy file of ssh module to the client machine
+     copy:
+       mode: 777
+       src: ssh_module.py
+       dest: /home/lynis/ssh_module.py 
+
+   - name: Executing the python script for ssh module
+     command: /home/lynis/ssh_module.py
+     register: ServerCheck
+   - debug: var={{ item }}
+     with_items:
+       - ServerCheck.stdout
+
+   - name: Restarting the sshd service
+     shell:
+       cmd: systemctl restart sshd

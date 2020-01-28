@@ -1,0 +1,38 @@
+---
+- hosts: all
+  #become: true
+  remote_user: root
+  #become: yes
+  tasks:
+   - name: Ensure SELinux is not disabled in bootloader configuration
+     replace:
+       path: '/etc/default/grub'
+       regexp: '(GRUB_CMDLINE_LINUX).*' 
+       replace: '\1=""'
+   
+   - name: Ensure address space layout randomization(ASLR) is enabled
+     lineinfile:
+       path: '/etc/default/grub'
+       insertbefore: EOF
+       line: 'GRUB_CMDLINE_LINUX_DEFAULT="quiet"'
+
+   - name: Updating the grub2 configuration
+     shell:
+       cmd: grub2-mkconfig > /boot/grub2/grub.cfg
+
+
+
+   - name: Ensuring the SELinux state is enforcing and policy is configured
+     selinux:
+       policy: targeted
+       state: enforcing
+
+   - name: Ensure SELinux is installed
+     yum:
+       name: libselinux
+       state: latest
+     register: PackageCheck
+
+   - name: Print package search result
+     debug: 
+       var: PackageCheck

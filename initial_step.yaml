@@ -1,0 +1,73 @@
+---
+- hosts: all
+  become: true
+  gather_facts: True
+  tasks:
+
+   - name: Ensure gpgcheck is globally activated
+     replace:
+       path: '/etc/yum.conf'
+       regexp: '(gpgcheck).*'  #Capture Group 1
+       replace: '\1=1'
+
+   - name: find repos to activate gpgcheck
+     find:
+       paths: '/etc/yum.repos.d/'
+       patterns: "*.repo"
+     register: repos
+
+
+   - name: enable gpgcheck in all repo files present in yum repos
+     replace: 
+       dest: "{{ item.path }}" 
+       backup: yes
+       regexp: 'gpgcheck\W\d+' 
+       replace: "gpgcheck=1"
+     with_items: "{{ repos.files }}"
+
+
+
+   - name: Find yum repos to uncomment baseurl path
+     find:
+       paths: '/etc/yum.repos.d/'
+       patterns: "*.repo"
+     register: repo
+
+   - name: uncomment baseurl path
+     replace:
+       dest: "{{ item.path }}"
+       backup: yes
+       regexp: '^#(baseurl.*)'
+       replace: '\1'
+     with_items: "{{ repo.files }}"
+
+
+   - name: yum clean all and yum repolist
+     command: yum clean metadata
+     args:
+       warn: no
+ 
+   - name: Ensure AIDE is installed on client machines
+     yum:
+       name: aide
+       state: present
+
+
+   - name: Ensure job that runs with the entry "0 5 * * * /usr/sbin/aide --check
+     cron:
+       name: check aide job is running
+       minute: "0"
+       hour: "5"
+       user: root
+       job: "/usr/bin/aide --check"
+   
+
+   - name: Ensure address space layout ramdomization(ASLR) is enabled
+     lineinfile:
+       path: '/etc/sysctl.conf'
+       insertbefore: EOF
+       line: 'kernel.randomize_va_space = 2'
+
+   - name: Enabling ASLR
+     shell: 
+       cmd: sysctl -w kernel.randomize_va_space=2

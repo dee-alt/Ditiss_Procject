@@ -1,0 +1,95 @@
+---
+- hosts: all
+  become: true
+  gather_facts: True
+  tasks:
+   - name: DCredit
+     replace:
+       path: 'security.cnf'
+       regexp: '^#*\sdcredit.*$'
+       replace: 'dcredit=-1'
+
+   - name: UCredit
+     replace:
+       path: 'security.cnf'
+       regexp: '^#*\sucredit.*$'
+       replace: 'ucredit=-1'
+
+   - name: OCredit
+     replace:
+       path: 'security.cnf'
+       regexp: '^#*\socredit.*$'
+       replace: 'ocredit=-1'
+
+   - name: LCredit
+     replace:
+       path: 'security.cnf'
+       regexp: '^#*\slcredit.*$'
+       replace: 'lcredit=-1'
+
+   - name: Minimum Length
+     replace:
+       path: 'security.cnf'
+       regexp: '^#*\sminlen\s*=\s*\d*$'
+       replace: 'minlen=14'
+
+   - name: Lockout for failed password attempt
+     blockinfile:
+       path: 'password.cfg'
+       insertafter: 'quiet_success'
+       block:  |
+         auth        required      pam_faillock.so preauth audit silent deny=5 unlock_time=900
+         auth        [success=1 default=bad] pam_unix.so
+         auth        [default=die] pam_faillock.so authfail audit deny=5 unlock_time=900
+         auth        sufficient pam_faillock.so authsucc audit deny=5 unlock_time=900
+       state: present
+
+   - name: Password reuse limited and password hashing alogirthm is SHA_512
+     replace:
+       path: 'password.cfg'
+       regexp: 'password\s*sufficient\s*pam_unix.so\s*.*'
+       replace: 'password    sufficient remember=5 sha512'
+
+   - name: Set password expiration days
+     replace:
+       path: '/etc/login.defs'
+       regexp: '^PASS_MAX_DAYS\s+\d+'
+       replace: 'PASS_MAX_DAYS	90'
+
+   - name: Set minimum days between password can be changed
+     replace:
+       path: '/etc/login.defs'
+       regexp: '^PASS_MIN_DAYS\s+\d+'
+       replace: 'PASS_MIN_DAYS	7'
+ 
+   - name: Set password expiration warning days
+     replace:
+       path: '/etc/login.defs'
+       regexp: '^PASS_WARN_AGE\s+\d+'
+       replace: 'PASS_WARN_AGE	7'
+
+   #- name: Set inactive password lock to 30 days 
+    # shell:
+    #   cmd: useradd -D -f 30
+
+   #- name: Set root gid 0
+    # shell:
+     #  cmd: usermod -g 0 root
+
+   - name: Set umask to 027 
+     replace:
+       path: '/etc/bashrc'
+       after: 'then'
+       regexp: '(^\s\s\s*umask).*'  #Capture Group 1
+       replace: \1 027
+
+   - name: Restrict the access to su command
+     replace:
+       path: '/etc/pam.d/su'
+       regexp: '^#(auth\s*.*pam_wheel.so\s.*)'
+       replace: '\1'
+
+   #- name: Add root user to wheel group
+    # shell:
+      # cmd: usermod -G wheel root
+
