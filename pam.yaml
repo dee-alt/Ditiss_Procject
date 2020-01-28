@@ -5,37 +5,37 @@
   tasks:
    - name: DCredit
      replace:
-       path: 'security.cnf'
+       path: '/etc/security/pwquality.cnf'
        regexp: '^#*\sdcredit.*$'
        replace: 'dcredit=-1'
 
    - name: UCredit
      replace:
-       path: 'security.cnf'
+       path: '/etc/security/pwquality.cnf'
        regexp: '^#*\sucredit.*$'
        replace: 'ucredit=-1'
 
    - name: OCredit
      replace:
-       path: 'security.cnf'
+       path: '/etc/security/pwquality.cnf'
        regexp: '^#*\socredit.*$'
        replace: 'ocredit=-1'
 
    - name: LCredit
      replace:
-       path: 'security.cnf'
+       path: '/etc/security/pwquality.cnf'
        regexp: '^#*\slcredit.*$'
        replace: 'lcredit=-1'
 
    - name: Minimum Length
      replace:
-       path: 'security.cnf'
+       path: '/etc/security/pwquality.cnf'
        regexp: '^#*\sminlen\s*=\s*\d*$'
        replace: 'minlen=14'
 
    - name: Lockout for failed password attempt
      blockinfile:
-       path: 'password.cfg'
+       path: '/etc/pam.d/password-auth'
        insertafter: 'quiet_success'
        block:  |
          auth        required      pam_faillock.so preauth audit silent deny=5 unlock_time=900
@@ -46,7 +46,7 @@
 
    - name: Password reuse limited and password hashing alogirthm is SHA_512
      replace:
-       path: 'password.cfg'
+       path: '/etc/pam.d/password.auth'
        regexp: 'password\s*sufficient\s*pam_unix.so\s*.*'
        replace: 'password    sufficient remember=5 sha512'
 
