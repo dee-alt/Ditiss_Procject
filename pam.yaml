@@ -5,31 +5,31 @@
   tasks:
    - name: DCredit
      replace:
-       path: '/etc/security/pwquality.cnf'
+       path: '/etc/security/pwquality.conf'
        regexp: '^#*\sdcredit.*$'
        replace: 'dcredit=-1'
 
    - name: UCredit
      replace:
-       path: '/etc/security/pwquality.cnf'
+       path: '/etc/security/pwquality.conf'
        regexp: '^#*\sucredit.*$'
        replace: 'ucredit=-1'
 
    - name: OCredit
      replace:
-       path: '/etc/security/pwquality.cnf'
+       path: '/etc/security/pwquality.conf'
        regexp: '^#*\socredit.*$'
        replace: 'ocredit=-1'
 
    - name: LCredit
      replace:
-       path: '/etc/security/pwquality.cnf'
+       path: '/etc/security/pwquality.conf'
        regexp: '^#*\slcredit.*$'
        replace: 'lcredit=-1'
 
    - name: Minimum Length
      replace:
-       path: '/etc/security/pwquality.cnf'
+       path: '/etc/security/pwquality.conf'
        regexp: '^#*\sminlen\s*=\s*\d*$'
        replace: 'minlen=14'
 
