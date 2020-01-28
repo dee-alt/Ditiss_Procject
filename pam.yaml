@@ -46,7 +46,7 @@
 
    - name: Password reuse limited and password hashing alogirthm is SHA_512
      replace:
-       path: '/etc/pam.d/password.auth'
+       path: '/etc/pam.d/password-auth'
        regexp: 'password\s*sufficient\s*pam_unix.so\s*.*'
        replace: 'password    sufficient remember=5 sha512'
 
