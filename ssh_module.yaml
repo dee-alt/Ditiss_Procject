@@ -1,7 +1,8 @@
 ---
 - hosts: all
   become: true
-  #user: lynis
+  remote_user: lynis
+  become_method: sudo
   gather_facts: True
   tasks:
    - name: Copy file of ssh module to the client machine
