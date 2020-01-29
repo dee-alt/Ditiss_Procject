@@ -1,7 +1,10 @@
 ---
 - hosts: all
+  become: true
+  remote_user: lynis
+  become_method: sudo
   #become: true
-  remote_user: root
+  #remote_user: root
   #become: yes
   tasks:
    - name: Ensure SELinux is not disabled in bootloader configuration
